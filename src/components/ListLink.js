@@ -18,14 +18,22 @@ class ListLink extends Component {
         this.props.loadToDoListCallback(this.props.toDoList);
     }
 
+    allowEdit = (toDoListID) => {
+        console.log("AOIALSL REACHED");
+        let listElement = document.getElementById('todo-list-button-'+toDoListID);
+        listElement.contentEditable = true;
+    }
+
     render() {
         // DISPLAY WHERE WE ARE
         console.log("\t\t\tListLink render");
 
         return (
             <div 
+                id={'todo-list-button-'+this.props.toDoList.id}
                 className='todo-list-button'
                 onClick={this.handleLoadList}
+                // onDoubleClick={this.allowEdit(this.props.toDoList.id)}
             >
                 {this.props.toDoList.name}<br />
             </div>

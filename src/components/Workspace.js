@@ -11,20 +11,39 @@ class Workspace extends Component {
     constructor(props) {
         super(props);
     }
+    removeSpecificItem = (itemID) => {
+        this.props.removeListItemCallback(itemID);
+    }
+    moveSpecificItemUp = (itemID) => {
+        this.props.moveListItemUpCallback(itemID);
+    }
+    moveSpecificItemDown = (itemID) => {
+        this.props.moveListItemDownCallback(itemID);
+    }
+    closeListCallback = () => {
+        console.log("CLEARING LIST VIEW");
+        let workspace = document.getElementById("workspace");
+        let toDoItems = document.getElementById("todo-list-items-div");
+        toDoItems.style.visibility = "hidden";
+    }
+
+    // deleteListItemCallback = () => {
+    //     console.log("DELETING LIST CURRENT ITEM");
+    // }
 
     render() {
         return (
             <div id="workspace">
-                <div id="todo-list-header-card" className="list-item-card">
+                <div id="todo-list-header-card" className="list-item-card-head">
                     <div id="task-col-header" className="item-col todo-button">Task</div>
                     <div id="date-col-header" className="item-col todo-button">Due Date</div>
                     <div id="status-col-header" className="item-col todo-button">Status</div>
-                    <div className="item-col" display="flex" flexDirection="row" flexWrap="nowrap">
+                    <div className="item-col button-group" display="flex" flexDirection="row" flexWrap="nowrap">
                         <Undo id="undo-button" className="list-item-control material-icons todo-button" />
                         <Redo id="redo-button" className="list-item-control material-icons todo-button" />
-                        <AddBox id="add-item-button" className="list-item-control material-icons todo-button" />
-                        <Delete id="delete-list-button" className="list-item-control material-icons todo-button" />
-                        <Close id="close-list-button" className="list-item-control material-icons todo-button" />
+                        <AddBox id="add-item-button" className="list-item-control material-icons todo-button" onClick={this.props.addNewListItemCallback}/>
+                        <Delete id="delete-list-button" className="list-item-control material-icons todo-button" onClick={this.props.deleteListItemCallback}/>
+                        <Close id="close-list-button" className="list-item-control material-icons todo-button" onClick={this.closeListCallback}/>
                     </div>
                 </div>
                 <div id="todo-list-items-div">
@@ -33,6 +52,9 @@ class Workspace extends Component {
                         <ToDoItem
                             key={toDoListItem.id}
                             toDoListItem={toDoListItem}     // PASS THE ITEM TO THE CHILDREN
+                            removeItemCallback={this.removeSpecificItem}
+                            moveItemUpCallback={this.moveSpecificItemUp}
+                            moveItemDownCallback={this.moveSpecificItemDown}
                         />))
                     }
                 </div>

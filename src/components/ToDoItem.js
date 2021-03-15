@@ -14,6 +14,7 @@ class ToDoItem extends Component {
         this.handleTaskChange = this.handleTaskChange.bind(this);
         this.handleDueDateChange = this.handleDueDateChange.bind(this);
         this.handleStatusChange = this.handleStatusChange.bind(this);
+        this.handleRemoveItem = this.handleRemoveItem.bind(this);
     }
 
     componentDidMount = () => {
@@ -26,6 +27,9 @@ class ToDoItem extends Component {
         console.log("Changing Task");
         let listItem = this.props.toDoListItem;
         let taskColumn = document.getElementById('todo-list-task-' + listItem.id);
+        let oldTask = taskColumn.innerHTML;
+        let transactionHandler = this.props.tps;
+
         taskColumn.addEventListener("keyup", function(event) {
             // Number 13 is the "Enter" key on the keyboard
             if (event.keyCode === 13) {
@@ -33,7 +37,14 @@ class ToDoItem extends Component {
               taskColumn.blur();
             }
           });
+        taskColumn.onblur = () => {
+            taskColumn.innerHTML.trim();
+            let newTask = taskColumn.innerHTML;
+            let taskChangeTransaction = new TaskChange_Transaction(this, oldTask, newTask, listItem.id);
+            transactionHandler.addTransaction(taskChangeTransaction);
+        }
         taskColumn.contentEditable = true;
+
 
         //IMPLEMENTATION NEEDED TO ASSIST REDO/UNDO
     }
@@ -69,7 +80,7 @@ class ToDoItem extends Component {
         let itemDiv = document.getElementById('todo-list-item-' + listItem.id); //We have access to the current div item
         let status = document.getElementById('todo-list-status-' + listItem.id); //We have access to the specific date div
         let statusMenu = document.createElement("select"); //We create an input element
-        statusMenu.className = "item-col status-col";   //To ensure when we load up the dropdown to replace the div, same padding
+        statusMenu.className = "status-col";   //To ensure when we load up the dropdown to replace the div, same padding
         statusMenu.style.background = "#353a44";  //Changes background color
         statusMenu.style.color = "#d9d6cc"; //Changes font color
         //Options for the dropdown
@@ -97,7 +108,41 @@ class ToDoItem extends Component {
         
         //IMPLEMENTATION NEEDED TO ASSIST REDO/UNDO
     }
+// Reference
+    // handleLoadList = () => {
+    //     this.props.loadToDoListCallback(this.props.toDoList);
+    // }
 
+    //Handles removal of Item from the list
+    handleRemoveItem = () => {
+        console.log("Removing Item");
+        let listItem = this.props.toDoListItem;
+        // this.props.loadToDoListCallback(this.props.toDoList);
+        this.props.removeItemCallback(listItem.id);
+        
+        
+        //IMPLEMENTATION NEEDED TO ASSIST REDO/UNDO
+    }
+    //Handles moving up of Item from the list
+    handleMovingUpItem = () => {
+        console.log("Moving Item Up");
+        let listItem = this.props.toDoListItem;
+        // this.props.loadToDoListCallback(this.props.toDoList);
+        this.props.moveItemUpCallback(listItem.id);
+        
+        
+        //IMPLEMENTATION NEEDED TO ASSIST REDO/UNDO
+    }
+    //Handles moving down of Item from the list
+    handleMovingDownItem = () => {
+        console.log("Moving Item Down");
+        let listItem = this.props.toDoListItem;
+        // this.props.loadToDoListCallback(this.props.toDoList);
+        this.props.moveItemDownCallback(listItem.id);
+        
+        
+        //IMPLEMENTATION NEEDED TO ASSIST REDO/UNDO
+    }
     render() {
         // DISPLAY WHERE WE ARE
         console.log("\t\t\tToDoItem render");
@@ -105,13 +150,14 @@ class ToDoItem extends Component {
         let statusType = "status-complete";
         if (listItem.status === "incomplete")
             statusType = "status-incomplete";
+        console.log("Description: " + listItem.description + " Due-Date: " + listItem.due_date + " Status: " + listItem.status);
 
         return (
             //This is the main toDoList item; contains all smaller components
             //task-col should be made editable as a text field when clicked on
             //due-date-col should open up a calendar input when clicked on
             //status-col should open up a dropdown input when clicked on
-            //test-4-col appears to be padding
+            //test-4-col appears to be padding - don't do anything to it
             //list-controls-col contains all the buttons for specific functions for the particular Item
             <div id={'todo-list-item-' + listItem.id} className='list-item-card'>
                 <div id={'todo-list-task-' + listItem.id} className='item-col task-col' onClick={this.handleTaskChange}>
@@ -125,9 +171,9 @@ class ToDoItem extends Component {
                 </div>
                 <div className='item-col test-4-col'></div>
                 <div className='item-col list-controls-col'>
-                    <KeyboardArrowUp className='list-item-control todo-button' />
-                    <KeyboardArrowDown className='list-item-control todo-button' />
-                    <Close className='list-item-control todo-button' />
+                    <KeyboardArrowUp id={'move-down-button-'+listItem.id} className='list-item-control todo-button' onClick={this.handleMovingUpItem}/>
+                    <KeyboardArrowDown id={'move-up-button-'+listItem.id} className='list-item-control todo-button' onClick={this.handleMovingDownItem}/>
+                    <Close id={'close-button-'+listItem.id} className='list-item-control todo-button' onClick={this.handleRemoveItem}/>
                     <div className='list-item-control'></div>
         <div className='list-item-control'></div>
                 </div>

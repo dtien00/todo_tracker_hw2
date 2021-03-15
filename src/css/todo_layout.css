@@ -27,7 +27,7 @@
     width:13%;
     top:5.5%;
     left:0%;
-    padding-left: 15px;
+    padding-left: 1%;
 }
 
 #workspace {
@@ -68,10 +68,6 @@
     width: 80%;
 }
 
-.todo-button {
-    white-space: nowrap;
-}
-
 #left-sidebar-controls {
     text-align: right;
 }
@@ -95,17 +91,43 @@
     display: flex;
     flex-direction: row;
 }
-
+.list-item-card-head {
+    padding-top: 20px;
+    height: 45px;
+    display: flex;
+    flex-direction: row;
+}
 .item-col {
-    width:25%;
+    width: 25%;
 }
 
 .list-controls-col {
-    /*display: flex;
+    display: flex;
     flex-direction: row; 
-    flex-wrap: nowrap;*/
+    flex-wrap: nowrap;
+}
+
+.todo-button {
+    width:24%;
+    white-space: nowrap;
 }
 
 .list-item-control {
     width: 20%;
 }
+
+.status-complete{
+    width: 7%;
+}
+
+.status-incomplete{
+    width: 7%;
+}
+
+/* .button-group {
+    display:flex;
+    flex-direction:row;
+    flex-wrap: nowrap;
+    width:10%;
+    padding: 4%;
+} */

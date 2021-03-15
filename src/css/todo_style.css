@@ -35,13 +35,13 @@
 }
 
 #left-sidebar-header {
-    border-bottom: dotted;
+    border-bottom: solid;
     font-size: 14pt;
     font-weight: bold;
 }
 
 #todo-list-header-card {
-    border-bottom: dotted;
+    border-bottom: solid;
     font-size: 14pt;
     font-weight: bold;
 }
@@ -109,4 +109,8 @@
 
 #add-item-button, #delete-list-button, #close-list-button {
     text-align: center;
+}
+
+.list-item-card:hover {
+    background-color: var(--swatch-contrast);
 }
