@@ -21,6 +21,19 @@ class ListLink extends Component {
     allowEdit = (toDoListID) => {
         console.log("AOIALSL REACHED");
         let listElement = document.getElementById('todo-list-button-'+toDoListID);
+        listElement.addEventListener("keyup", function(event) {
+            // Number 13 is the "Enter" key on the keyboard
+            if (event.keyCode === 13) {
+              // Cancel the default action, if needed
+              listElement.blur();
+            }
+          });
+        listElement.onblur = () => {
+            console.log("BLUIRRED");
+            listElement.innerHTML.trim();
+            listElement.contentEditable = false;
+        }
+        
         listElement.contentEditable = true;
     }
 
@@ -28,12 +41,16 @@ class ListLink extends Component {
         // DISPLAY WHERE WE ARE
         console.log("\t\t\tListLink render");
 
+        let topOfToDoList = "notCurrentList";
+        if(this.props.currentListID==this.props.toDoList.id)
+            topOfToDoList = "currentList";
+        console.log("CURRENT LIST: " + this.props.currentListID);
+
         return (
             <div 
                 id={'todo-list-button-'+this.props.toDoList.id}
-                className='todo-list-button'
+                className='todo-list-button' className={topOfToDoList}
                 onClick={this.handleLoadList}
-                // onDoubleClick={this.allowEdit(this.props.toDoList.id)}
             >
                 {this.props.toDoList.name}<br />
             </div>

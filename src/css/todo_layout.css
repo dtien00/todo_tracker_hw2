@@ -28,6 +28,7 @@
     top:5.5%;
     left:0%;
     padding-left: 1%;
+    overflow-y: auto;
 }
 
 #workspace {
@@ -64,8 +65,11 @@
 
 .todo-list-button {
     padding-top:20px;
-    height: 60px;
+    height: auto;
     width: 80%;
+    padding-top: 5%;
+    padding-bottom: 5%;
+    /* text-overflow: clip; */
 }
 
 #left-sidebar-controls {
@@ -83,7 +87,12 @@
     top:7%;
     display: flex;
     flex-direction: column;
+    overflow-y: auto;
 }
+
+/* #todo-list-items-div::-webkit-scrollbar {
+    width: 1em;
+} */
 
 .list-item-card {
     padding-top:20px;
@@ -117,13 +126,30 @@
 }
 
 .status-complete{
-    width: 7%;
+    width: 2.3%;
 }
 
 .status-incomplete{
-    width: 7%;
+    width: 2.3%;
 }
 
+.currentList {
+    padding-top:20px;
+    height: auto;
+    width: 80%;
+    padding-top: 5%;
+    padding-bottom: 5%;
+    /* text-overflow: clip; */
+}
+
+.notCurrentList {
+    padding-top:20px;
+    height: auto;
+    width: 80%;
+    padding-top: 5%;
+    padding-bottom: 5%;
+    /* text-overflow: clip; */
+}
 /* .button-group {
     display:flex;
     flex-direction:row;

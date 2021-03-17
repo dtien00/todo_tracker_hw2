@@ -3,10 +3,12 @@ import React, { Component } from 'react';
 import testData from './test/testData.json'
 import jsTPS from './common/jsTPS'
 
-import ChangeDate_Transaction from './transactions/transactions/ChangeDate_Transaction.js'
-import TaskChange_Transaction from './transactions/transactions/TaskChange_Transaction.js'
-import StatusChange_Transaction from './transactions/transactions/StatusChange_Transaction.js'
-import RemoveItem_Transaction from './transactions/transactions/RemoveItem_Transaction.js'
+import ChangeDate_Transaction from './transactions/ChangeDate_Transaction.js'
+import TaskChange_Transaction from './transactions/TaskChange_Transaction.js'
+import StatusChange_Transaction from './transactions/StatusChange_Transaction.js'
+import RemoveItem_Transaction from './transactions/RemoveItem_Transaction.js'
+import MoveItemUp_Transaction from './transactions/MoveItemUp_Transaction';
+import MoveItemDown_Transaction from './transactions/MoveItemDown_Transaction';
 
 // THESE ARE OUR REACT COMPONENTS
 import Navbar from './components/Navbar'
@@ -14,8 +16,8 @@ import LeftSidebar from './components/LeftSidebar'
 import Workspace from './components/Workspace'
 {/*import ItemsListHeaderComponent from './components/ItemsListHeaderComponent'
 import ItemsListComponent from './components/ItemsListComponent'
-import ListsComponent from './components/ListsComponent'
-*/}
+import ListsComponent from './components/ListsComponent'*/
+}
 class App extends Component {
   constructor(props) {
     // ALWAYS DO THIS FIRST
@@ -57,7 +59,9 @@ class App extends Component {
       currentList: {items: []},
       nextListId: highListId+1,
       nextListItemId: highListItemId+1,
-      useVerboseFeedback: true
+      useVerboseFeedback: true,
+
+      viewingList: false
     }
   }
 
@@ -83,7 +87,8 @@ class App extends Component {
 
     this.setState({
       toDoLists: nextLists,
-      currentList: toDoList
+      currentList: toDoList,
+      viewingList: true
     });
   }
 
@@ -102,7 +107,7 @@ class App extends Component {
 
   makeNewToDoList = () => {
     let newToDoList = {
-      id: this.highListId,
+      id: this.state.highListId,
       name: 'Untitled',
       items: []
     };
@@ -127,21 +132,39 @@ class App extends Component {
     localStorage.setItem("recent_work", toDoListsString);
   }
 
-  //Removes the specified item from the toDoList and refreshes the workspace
-  removeListItem = (itemID) => {
+  //Creates a Transaction item to remove the item
+  createRemoveItemTransaction = (itemID) => {
     let itemList = this.state.currentList.items;
+    let transactionHandler = this.tps;
     let indexOfItem = -1;
     for (let i = 0; (i < itemList.length) && (indexOfItem < 0); i++) {
         if (itemList[i].id === itemID) {
             indexOfItem = i;
         }
     }
-    itemList.splice(indexOfItem, 1);  //Removes the item
+    transactionHandler.addTransaction(new RemoveItem_Transaction(this, itemList[indexOfItem], indexOfItem));
+  }
+
+  //Removes the specified item from the toDoList and refreshes the workspace
+  removeItem = (indexOfItem) => {
+    let itemList = this.state.currentList.items;
+    if(indexOfItem!=-1){
+      itemList.splice(indexOfItem,1);
+    }
     this.loadToDoList(this.state.currentList);  //'Refreshes' the list
   }
 
+  //Adds the specific item removed back into the list
+  addRemovedItem = (removedItem, indexOfItem) => {
+    let itemList = this.state.currentList.items;
+    if(indexOfItem!=-1){
+      itemList.splice(indexOfItem,0,removedItem);
+    }
+    this.loadToDoList(this.state.currentList);
+  }
+
   //Adds a new default item to the current list. Probably best to push
-  addListItem = () => {
+  addNewListItem = () => {
     console.log("Adding new item");
     let itemList = this.state.currentList.items;
     let newItem = this.makeNewToDoListItem();
@@ -151,8 +174,9 @@ class App extends Component {
   }
 
   //Moves up the item to the current list.
-  moveListItemUp = (itemID) => {
-    console.log("Adding new item");
+  createMoveItemUpTransaction = (itemID) => {
+    console.log("Moving up new item");
+    let transactionHandler = this.tps;
     let itemList = this.state.currentList.items;
     let indexOfItem = -1;
     for (let i = 1; (i < itemList.length) && (indexOfItem < 0); i++) {
@@ -161,17 +185,23 @@ class App extends Component {
         }
     }
     if(indexOfItem!=-1){
+      transactionHandler.addTransaction(new MoveItemUp_Transaction(this, indexOfItem));
+    }
+  }
+
+  moveItemUp = (indexOfItem) => {
+    let itemList = this.state.currentList.items;
+    if(indexOfItem!=-1){
       let tempItem = itemList[indexOfItem];
       itemList[indexOfItem]=itemList[indexOfItem-1];
       itemList[indexOfItem-1]=tempItem;
     }
-
     this.loadToDoList(this.state.currentList);
   }
 
   //Moves down the item to the current list.
-  moveListItemDown = (itemID) => {
-    console.log("Adding new item");
+  createMoveItemDownTransaction = (itemID) => {
+    let transactionHandler = this.tps;
     let itemList = this.state.currentList.items;
     let indexOfItem = -1;
     for (let i = 0; (i < itemList.length-1) && (indexOfItem < 0); i++) {
@@ -180,14 +210,21 @@ class App extends Component {
         }
     }
     if(indexOfItem!=-1){
+      transactionHandler.addTransaction(new MoveItemDown_Transaction(this, indexOfItem));
+    }
+
+  }
+
+  //Moves item down in the currentlist given its index
+  moveItemDown = (indexOfItem) => {
+    let itemList = this.state.currentList.items;
+    if(indexOfItem!=-1){
       let tempItem = itemList[indexOfItem];
       itemList[indexOfItem]=itemList[indexOfItem+1];
       itemList[indexOfItem+1]=tempItem;
     }
-
     this.loadToDoList(this.state.currentList);
   }
-
   // //Changes the name of the list
   // editListName = () => {
   //   console.log("Editing list name");
@@ -200,26 +237,88 @@ class App extends Component {
     console.log("Closing list view");
     this.setState({
       toDoLists: this.state.toDoLists,
-      currentList: null
+      currentList: {items:[]},
+      viewingList: false
     });
-    let workspace = document.getElementById("workspace");
-    let listItems = document.getElementById("todo-list-items-div");
-    workspace.remove(listItems);
-    this.render();
-    // this.loadToDoList(this.state.currentList);
   }
 
   //Deletes the top list in the left sidebar. If no more lists exists, create a new list to act as a placeholder. Patch this later
   deleteFirstList = () => {
-    console.log("DELETING FIRST LIST");
-    let toDoListsList = this.state.toDoLists;
-    toDoListsList.splice(0,1);
-    this.setState({
-      toDoLists: toDoListsList,
-      currentList: toDoListsList.length==0 ? this.makeNewToDoList() : toDoListsList[0] 
-    });
-    let workspaceItems = document.getElementById("todo-list-items-div");
-    workspaceItems.style.visibility = "hidden";
+    if( window.confirm("Are you sure you want to delete?")){
+      let toDoListsList = this.state.toDoLists;
+      toDoListsList.splice(0,1);
+      this.setState({
+        toDoLists: toDoListsList,
+        currentList: toDoListsList.length==0 ? this.makeNewToDoList() : {items:[]},
+        viewingList: false
+      });
+    }
+  }
+
+  
+  //Allows the textfield of the task column to be changed
+  createTaskChangeTransaction = (item, oldTask, newTask) => {
+      console.log("Changing Task");
+      console.log(item + " " + oldTask + " " + newTask);
+      let transactionHandler = this.tps;
+      if(oldTask!=newTask)
+        transactionHandler.addTransaction(new TaskChange_Transaction(this, oldTask, newTask, item));
+  }
+
+  //Changes the task
+  changeTask = (taskChange, item) => {
+    console.log("CURRENT ITEM: \n" + item);
+    console.log("Changing task to: \n" + taskChange);
+    item.description = taskChange;
+    this.loadToDoList(this.state.currentList);
+  }
+
+  //Creates a status change Transaction object
+  createStatusChangeTransaction = (item, oldStatus, newStatus) => {
+    let transactionHandler = this.tps;
+
+    if(oldStatus!=newStatus)
+      transactionHandler.addTransaction(new StatusChange_Transaction(this, oldStatus, newStatus, item));
+    
+  }
+
+  //Changes the task
+  changeStatus = (status, item) => {
+    item.status = status;
+    // if(status === "complete")
+    //   item.style.color = "#19c8ff";
+    // else
+    //   item.style.color = "#ffc819";
+  }
+
+  //Creates a Transaction for changing the due date
+  createDueDateChangeTransaction = (item, oldDate, newDate) => {
+    console.log("TRANSACTION: " + item + " " + oldDate + " " + newDate);
+    let transactionHandler = this.tps;
+    if(oldDate!=newDate)
+        transactionHandler.addTransaction(new ChangeDate_Transaction(this, oldDate, newDate, item));
+  }
+
+  //Changes the date of the itemID
+  changeDate = (date, item) => {
+    item.due_date = date;
+    if(date == "" || date == null)    //If the due date was left blank, placeholder text is set
+      item.due_date = "N/A: Assign a Date";
+    this.loadToDoList(this.state.currentList);
+  }
+
+  //Undos the latest Transaction if there is one
+  undoTransaction = () => {
+    if(this.tps.hasTransactionToUndo()){
+        this.tps.undoTransaction();
+    }
+  }
+
+  //Redos the latest Transaction if there is one
+  redoTransaction = () => {
+    if(this.tps.hasTransactionToRedo()){
+        this.tps.doTransaction();
+    }
   }
 
   render() {
@@ -232,13 +331,21 @@ class App extends Component {
           loadToDoListCallback={this.loadToDoList}
           addNewListCallback={this.addNewList}
           onClick={this.editListName}
+          currentList={this.state.currentList}
         />
         <Workspace toDoListItems={items} 
-          removeListItemCallback={this.removeListItem}
-          addNewListItemCallback={this.addListItem}
+          transactionHandler={this.tps}
+          appState={this}
+          handleSpecificTaskChangeCallback={this.createTaskChangeTransaction}
+          handleSpecificStatusChangeCallback={this.createStatusChangeTransaction}
+          handleSpecificDueDateChangeCallback={this.createDueDateChangeTransaction}
+          removeListItemCallback={this.createRemoveItemTransaction}
+          addNewListItemCallback={this.addNewListItem}
           deleteListItemCallback={this.deleteFirstList}//FIX
-          moveListItemUpCallback={this.moveListItemUp}
-          moveListItemDownCallback={this.moveListItemDown}
+          moveListItemUpCallback={this.createMoveItemUpTransaction}
+          moveListItemDownCallback={this.createMoveItemDownTransaction}
+          undoTransactionCallback={this.undoTransaction}
+          redoTransactionCallback={this.redoTransaction}
           // closeListCallback={console.log("REACHED")}//FIX
         />
       </div>

@@ -4,6 +4,10 @@ import KeyboardArrowUp from '@material-ui/icons/KeyboardArrowUp';
 import KeyboardArrowDown from '@material-ui/icons/KeyboardArrowDown';
 import Close from '@material-ui/icons/Close';
 
+function updateState(params) {
+    this.setState({params});
+}
+
 class ToDoItem extends Component {
     constructor(props) {
         super(props);
@@ -11,10 +15,35 @@ class ToDoItem extends Component {
         // DISPLAY WHERE WE ARE
         console.log("\t\t\tToDoItem " + this.props.toDoListItem.id + " constructor");
         //Binds scope of this to our handleTaskChange
-        this.handleTaskChange = this.handleTaskChange.bind(this);
-        this.handleDueDateChange = this.handleDueDateChange.bind(this);
-        this.handleStatusChange = this.handleStatusChange.bind(this);
-        this.handleRemoveItem = this.handleRemoveItem.bind(this);
+        // this.handleTaskChange = this.handleTaskChange.bind(this);
+        // this.handleDueDateChange = this.handleDueDateChange.bind(this);
+        // this.handleStatusChange = this.handleStatusChange.bind(this);
+        // this.handleRemoveItem = this.handleRemoveItem.bind(this);
+
+        this.taskInput = React.createRef();
+        this.dueDateInput = React.createRef();
+        this.statusInput = React.createRef();
+
+        this.alterTaskState = this.alterTaskState.bind(this);
+
+        //To do it correctly: set the state
+        this.state = {
+            task: this.props.toDoListItem.description,
+            dueDate: this.props.toDoListItem.due_date,
+            status: this.props.toDoListItem.status,
+            editingTask: false,
+            editingDueDate: false,
+            editingStatus: false,
+            topOfList: false,
+            bottomOfList: false
+        }
+        updateState = updateState.bind(this);
+    }
+    
+    alterTaskState = (newTask) => {
+        this.setState({
+            task: newTask
+        });
     }
 
     componentDidMount = () => {
@@ -22,91 +51,17 @@ class ToDoItem extends Component {
         console.log("\t\t\tToDoItem " + this.props.toDoListItem.id + " did mount");
     }
 
-    //Allows the textfield of the task column to be changed
-    handleTaskChange() {
-        console.log("Changing Task");
-        let listItem = this.props.toDoListItem;
-        let taskColumn = document.getElementById('todo-list-task-' + listItem.id);
-        let oldTask = taskColumn.innerHTML;
-        let transactionHandler = this.props.tps;
-
-        taskColumn.addEventListener("keyup", function(event) {
-            // Number 13 is the "Enter" key on the keyboard
-            if (event.keyCode === 13) {
-              // Cancel the default action, if needed
-              taskColumn.blur();
-            }
-          });
-        taskColumn.onblur = () => {
-            taskColumn.innerHTML.trim();
-            let newTask = taskColumn.innerHTML;
-            let taskChangeTransaction = new TaskChange_Transaction(this, oldTask, newTask, listItem.id);
-            transactionHandler.addTransaction(taskChangeTransaction);
-        }
-        taskColumn.contentEditable = true;
-
-
-        //IMPLEMENTATION NEEDED TO ASSIST REDO/UNDO
+    handleTaskChange = (oldTask, newTask) => {
+        this.props.handleTaskChangeCallback(this.props.toDoListItem, oldTask, newTask);
     }
 
     //Allows the due-date of the Item object to be changed
-    handleDueDateChange() {
-        console.log("Changing due-date");
-        let listItem = this.props.toDoListItem;
-        let itemDiv = document.getElementById('todo-list-item-' + listItem.id); //We have access to the current div item
-        let dueDate = document.getElementById('todo-list-due-date-' + listItem.id); //We have access to the specific date div
-        let calendar = document.createElement("input"); //We create an input element
-        calendar.type = "date"; //We make it of type date; opens up a calendar for us
-        calendar.className = "item-col due-date-col";   //To ensure when we load up the calendar to replace the div, same padding
-        calendar.style.background = "#353a44";  //Changes background color
-        calendar.style.color = "#d9d6cc"; //Changes font color
-        itemDiv.replaceChild(calendar, dueDate);    //Replaces the dueDate div with the calendar object  
-        calendar.contentEditable = true;    //Allows us to edit the calendar
-        calendar.addEventListener('blur', (event) => {  //Code for when the calendar object loses focus
-            let newDate = calendar.value;   //Preserves new date the calendar was inputted
-            itemDiv.replaceChild(dueDate, calendar);    //Replaces the div back in place of the calendar
-            dueDate.innerHTML = newDate;    //Sets the div to the value of what the calendar was changed to
-            if(dueDate.innerHTML == "" || dueDate.innerHTML == null)    //If the due date was left blank, placeholder text is set
-                dueDate.innerHTML = "N/A: Assign a Date";
-          });
-        
-        //IMPLEMENTATION NEEDED TO ASSIST REDO/UNDO
-        
+    handleDueDateChange(oldDate, newDate) {
+        this.props.handleDueDateChangeCallback(this.props.toDoListItem, oldDate, newDate);
     }
 
-    handleStatusChange() {
-        console.log("Changing status");
-        let listItem = this.props.toDoListItem;
-        let itemDiv = document.getElementById('todo-list-item-' + listItem.id); //We have access to the current div item
-        let status = document.getElementById('todo-list-status-' + listItem.id); //We have access to the specific date div
-        let statusMenu = document.createElement("select"); //We create an input element
-        statusMenu.className = "status-col";   //To ensure when we load up the dropdown to replace the div, same padding
-        statusMenu.style.background = "#353a44";  //Changes background color
-        statusMenu.style.color = "#d9d6cc"; //Changes font color
-        //Options for the dropdown
-        let completeOption = document.createElement("option");
-        completeOption.innerHTML = "complete";
-        completeOption.style.background = "#353a44";  //Changes background color
-        completeOption.style.color = "#19c8ff"; //Changes font color
-        statusMenu.appendChild(completeOption);
-        let incompleteOption = document.createElement("option");
-        incompleteOption.innerHTML = "incomplete";
-        incompleteOption.style.background = "#353a44";  //Changes background color
-        incompleteOption.style.color = "#ffc819"; //Changes font color
-        statusMenu.appendChild(incompleteOption);
-
-        itemDiv.replaceChild(statusMenu, status);    //Replaces the dueDate div with the calendar object
-        statusMenu.addEventListener('blur', (event) => {  //Code for when the calendar object loses focus
-            let optionChosen = statusMenu.value;
-            itemDiv.replaceChild(status, statusMenu);
-            status.innerHTML = optionChosen;
-            if(status.innerHTML == "complete")
-                status.style.color = "#19c8ff";
-            else
-                status.style.color = "#ffc819"
-          });
-        
-        //IMPLEMENTATION NEEDED TO ASSIST REDO/UNDO
+    handleStatusChange = (oldStatus, newStatus) => {
+        this.props.handleStatusChangeCallback(this.props.toDoListItem, oldStatus, newStatus);
     }
 // Reference
     // handleLoadList = () => {
@@ -143,6 +98,16 @@ class ToDoItem extends Component {
         
         //IMPLEMENTATION NEEDED TO ASSIST REDO/UNDO
     }
+
+    //To do it in proper REACT style: Have methods that return JavaScript objects
+    createEditableTaskObject() {
+        let listItem = this.props.toDoListItem;
+    }
+    createTaskDiv() {
+        let listItem = this.props.toDoListItem;
+    }
+        
+
     render() {
         // DISPLAY WHERE WE ARE
         console.log("\t\t\tToDoItem render");
@@ -152,6 +117,85 @@ class ToDoItem extends Component {
             statusType = "status-incomplete";
         console.log("Description: " + listItem.description + " Due-Date: " + listItem.due_date + " Status: " + listItem.status);
 
+        //Creating our items
+        //Task Item (Uneditable Div and Editable input)
+        let taskDiv = <div id={'todo-list-task-' + listItem.id} className='item-col task-col' 
+                        onClick={() => {
+                            console.log("TRUE"); 
+                            this.setState({
+                                editingTask: true
+                            });
+                        }}>
+                        {listItem.description}
+                      </div>;
+        let editableTaskObject = <input type="text" defaultValue={listItem.description} ref={this.taskInput} id={'todo-list-task-input-' + listItem.id} 
+                                        className='item-col task-col' 
+                        onBlur={() => {
+                            console.log("FALSE");
+                            console.log(this.state.task); 
+                            console.log(this.taskInput.current.value);
+                            this.setState({
+                                task: this.taskInput.current.value,
+                                editingTask: false 
+                            });
+                            if(this.state.task!=this.taskInput.current.value)
+                                this.handleTaskChange(this.state.task, this.taskInput.current.value);
+                        }}>
+                        </input>;
+        let dueDateDiv = <div id={'todo-list-due-date-' + listItem.id} className='item-col due-date-col' 
+                        onClick={() => {
+                            this.setState({
+                                editingDueDate: true
+                            })
+                        }}>
+                            {listItem.due_date}
+                        </div>;
+        let editableDueDateObject = <input type="date" ref={this.dueDateInput} className="item-col due-date-col" background="#353a44" color="#d9d6cc"
+                        onBlur={() => {
+                                console.log("FALSE");
+                                console.log(this.state.dueDate); 
+                                console.log(this.dueDateInput.current.value);
+                            this.setState({
+                                dueDate: this.dueDateInput.current.value,
+                                editingDueDate: false 
+                            });
+                            if(this.state.dueDate!=this.dueDateInput.current.value)
+                                this.handleDueDateChange(this.state.dueDate, this.dueDateInput.current.value);
+                        }}>
+                        </input>
+
+        let statusDiv = <div id={'todo-list-status-' + listItem.id} className={statusType} 
+                        onClick={() => {
+                            this.setState({
+                                editingStatus: true
+                            })
+                        }}>
+                            {listItem.status}
+                        </div>
+        let editableStatusObject = <select className={"status-col"} background="#353a44" ref={this.statusInput} color = "#d9d6cc" 
+                        onBlur={() => {
+                            console.log("FALSE");
+                            console.log(this.state.status); 
+                            console.log(this.statusInput.current.value);
+                            this.setState({
+                                status: this.statusInput.current.value,
+                                editingStatus: false 
+                            });
+                            if(this.state.status!=this.statusInput.current.value)
+                                this.handleStatusChange(this.state.status, this.statusInput.current.value);
+                        }}>
+                            <option className={"complete-option"} defaultText="complete" background = "#353a44" color = "#19c8ff">{"complete"}</option>
+                            <option className={"incomplete-option"} defaultText="incomplete" background = "#353a44" color = "#ffc819">{"incomplete"}</option>
+                        </select>;
+
+        let upEnabled = "enabled";
+        if(this.props.list[0].id===listItem.id)
+            upEnabled = "disabled";
+
+        let downEnabled = "enabled";
+        if(this.props.list[this.props.list.length-1].id===listItem.id)
+            downEnabled = "disabled";
+
         return (
             //This is the main toDoList item; contains all smaller components
             //task-col should be made editable as a text field when clicked on
@@ -160,22 +204,19 @@ class ToDoItem extends Component {
             //test-4-col appears to be padding - don't do anything to it
             //list-controls-col contains all the buttons for specific functions for the particular Item
             <div id={'todo-list-item-' + listItem.id} className='list-item-card'>
-                <div id={'todo-list-task-' + listItem.id} className='item-col task-col' onClick={this.handleTaskChange}>
-                    {listItem.description}
-                </div>
-                <div id={'todo-list-due-date-' + listItem.id} className='item-col due-date-col' onClick={this.handleDueDateChange}>
-                    {listItem.due_date}
-                </div>
-                <div id={'todo-list-status-' + listItem.id} className='item-col status-col' className={statusType} onClick={this.handleStatusChange}>
-                    {listItem.status}
-                </div>
+
+                {this.state.editingTask ? editableTaskObject : taskDiv}
+                {this.state.editingDueDate ? editableDueDateObject: dueDateDiv}
+                {this.state.editingStatus ? editableStatusObject : statusDiv}
+
                 <div className='item-col test-4-col'></div>
+
                 <div className='item-col list-controls-col'>
-                    <KeyboardArrowUp id={'move-down-button-'+listItem.id} className='list-item-control todo-button' onClick={this.handleMovingUpItem}/>
-                    <KeyboardArrowDown id={'move-up-button-'+listItem.id} className='list-item-control todo-button' onClick={this.handleMovingDownItem}/>
+                    <KeyboardArrowUp id={'move-down-button-'+listItem.id} className='list-item-control todo-button' className={upEnabled} onClick={this.handleMovingUpItem}/>
+                    <KeyboardArrowDown id={'move-up-button-'+listItem.id} className='list-item-control todo-button' className={downEnabled} onClick={this.handleMovingDownItem}/>
                     <Close id={'close-button-'+listItem.id} className='list-item-control todo-button' onClick={this.handleRemoveItem}/>
                     <div className='list-item-control'></div>
-        <div className='list-item-control'></div>
+            <div className='list-item-control'></div>
                 </div>
             </div>
         )

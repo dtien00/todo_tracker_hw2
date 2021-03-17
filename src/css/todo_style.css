@@ -87,7 +87,7 @@
 
 .todo-button {
     cursor:pointer;
-    background-color: var(--swatch-complement);
+    background-color: var(--swatch-primary);
     font-weight: bold;
 }
 
@@ -112,5 +112,55 @@
 }
 
 .list-item-card:hover {
+    background-color: var(--swatch-complement);
+}
+
+.complete-option {
+    background: "#353a44" ;
+    color: "#19c8ff";
+}
+
+.enabled {
+    cursor:pointer;
+    background-color: var(--swatch-primary);
+    font-weight: bold;
+}
+
+.disabled {
+    cursor:default;
+    color: var(--swatch-complement);
+    background-color: var(--swatch-primary);
+    font-weight: lighter;
+}
+
+.enabled:hover {
+    background-color: var(--swatch-contrast);
+}
+
+.disabled:hover {
+    background-color: var(--swatch-contrast);
+}
+
+.currentList {
+    cursor:pointer;
+    background-color: var(--swatch-primary);
+    color: var(--swatch-accent);
+    font-weight: bold;
+}
+
+.notCurrentList {
+    cursor:pointer;
+    font-weight: bold;
+    background-color: var(--swatch-complement);
+    color: var(--swatch-text);
+}
+
+
+.currentList:hover {
+    background-color: var(--swatch-contrast);
+}
+
+
+.notCurrentList:hover {
     background-color: var(--swatch-contrast);
 }

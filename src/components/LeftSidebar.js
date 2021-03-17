@@ -6,10 +6,9 @@ import AddBox from '@material-ui/icons/AddBox';
 class LeftSidebar extends Component {
     constructor(props) {
         super(props);
-    }
-
-    handleAddNewList = () => {
-        this.props.addNewListCallback();
+        this.state = {
+            viewingList: false
+        }
     }
 
 
@@ -31,6 +30,8 @@ class LeftSidebar extends Component {
                         <ListLink
                             
                             key={toDoList.id}
+                            currentListID={this.props.currentList.id}
+                            toDoLists={this.props.toDoLists}
                             toDoList={toDoList}                                // PASS THE LIST TO THE CHILDREN
                             loadToDoListCallback={this.props.loadToDoListCallback} />  // PASS THE CALLBACK TO THE CHILDREN
                     ))
