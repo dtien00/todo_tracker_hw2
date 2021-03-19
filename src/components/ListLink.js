@@ -16,6 +16,7 @@ class ListLink extends Component {
 
     handleLoadList = () => {
         this.props.loadToDoListCallback(this.props.toDoList);
+        console.log("LIST ID: " + this.props.currentListID + " VS " + this.props.toDoList.id);
     }
 
     allowEdit = (toDoListID) => {
@@ -44,6 +45,7 @@ class ListLink extends Component {
         if(this.props.currentListID==this.props.toDoList.id)
             topOfToDoList = "currentList";
         console.log("CURRENT LIST: " + this.props.currentListID);
+        // console.log("ALL LIST IDS: " + this.props.appState.state.toDoLists);
 
         return (
             <div 

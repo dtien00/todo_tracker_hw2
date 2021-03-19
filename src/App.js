@@ -146,7 +146,7 @@ class App extends Component {
 
   makeNewToDoList = () => {
     let newToDoList = {
-      id: this.state.highListId,
+      id: this.state.nextListId,
       name: 'Untitled',
       items: []
     };

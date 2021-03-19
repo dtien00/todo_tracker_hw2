@@ -11,6 +11,9 @@ class LeftSidebar extends Component {
         }
     }
 
+    handleAddNewList = () => {
+        this.props.addNewListCallback();
+    }
 
     render() {
         return (
