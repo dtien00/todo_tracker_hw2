@@ -19,7 +19,6 @@ class ListLink extends Component {
     }
 
     allowEdit = (toDoListID) => {
-        console.log("AOIALSL REACHED");
         let listElement = document.getElementById('todo-list-button-'+toDoListID);
         listElement.addEventListener("keyup", function(event) {
             // Number 13 is the "Enter" key on the keyboard

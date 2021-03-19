@@ -125,14 +125,27 @@
     width: 20%;
 }
 
+.status-col {
+    width: 8%;
+    /* margin: right 2%; */
+}
+
 .status-complete{
-    width: 2.3%;
+    width: 8%;
 }
 
 .status-incomplete{
-    width: 2.3%;
+    width: 8%;
 }
-
+.test-4-col {
+    width: 18.5%;
+}
+.due-date-col {
+    width: 24.5%;
+}
+.task-col {
+    width: 24.5%;
+}
 .currentList {
     padding-top:20px;
     height: auto;

@@ -8,10 +8,10 @@
     --swatch-primary:       #40454e; /* DOMINANT COLOR, USED FOR MOST BACKGROUNDS */
     --swatch-complement:    #353a44; /* USED IN CONTRAST BACKGROUND FOR TOOLBARS */
     --swatch-contrast:      #111111; /* USED IN MOUSE-OVER SELECTION OF LARGE ELEMENTS */
-    --swatch-accent:        #ffc819; /* USED IN MOUSE-OVER SELECTION OF TEXT AND BORDERS */  
+    --swatch-accent:        #f5bc75; /* USED IN MOUSE-OVER SELECTION OF TEXT AND BORDERS */  
 
     --swatch-text:          #e9edf0; /* USED IN MOUSE-OVER SELECTION OF TEXT AND BORDERS */ 
-    --swatch-text-accent:   #19c8ff; /* USED IN MOUSE-OVER SELECTION OF TEXT AND BORDERS */  
+    --swatch-text-accent:   #8ed4f8; /* USED IN MOUSE-OVER SELECTION OF TEXT AND BORDERS */  
 
     --font-primary:         'Consolas', sans-serif;
 }
@@ -69,6 +69,10 @@
     cursor: pointer;
 }
 
+.list-item-control:hover{
+    background: transparent;
+}
+
 .list-item-card {
     border-bottom: solid;
     border-width: 1px;
@@ -92,7 +96,7 @@
 }
 
 .todo-button:hover {
-    background-color: var(--swatch-contrast);
+    background-color: transparent;
 }
 
 #add-list-button {
@@ -101,6 +105,11 @@
 
 .status-incomplete {
     color: var(--swatch-accent);
+}
+
+.status-col {
+    background: var(--swatch-complement);
+    color: var(--swatch-text);
 }
 
 .status-complete {
@@ -163,4 +172,25 @@
 
 .notCurrentList:hover {
     background-color: var(--swatch-contrast);
+}
+
+.editable-text-input {
+    background-color: var(--swatch-complement);
+}
+
+.complete-option{
+    color: var(--swatch-text-accent);
+}
+
+.incomplete-option{
+    color: var(--swatch-accent);
+}
+
+.item-col{
+    background: var(--swatch-primary);
+    color: var(--swatch-text);
+}
+
+.item-col:hover{
+    background: var(--swatch-complement);
 }

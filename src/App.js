@@ -14,6 +14,7 @@ import MoveItemDown_Transaction from './transactions/MoveItemDown_Transaction';
 import Navbar from './components/Navbar'
 import LeftSidebar from './components/LeftSidebar'
 import Workspace from './components/Workspace'
+import AddNewItem_Transaction from './transactions/AddNewItem_Transaction';
 {/*import ItemsListHeaderComponent from './components/ItemsListHeaderComponent'
 import ItemsListComponent from './components/ItemsListComponent'
 import ListsComponent from './components/ListsComponent'*/
@@ -61,9 +62,33 @@ class App extends Component {
       nextListItemId: highListItemId+1,
       useVerboseFeedback: true,
 
+      viewingList: false,
+      ctrlPressedDown: false,
+      zPressedDown: false,
+      yPressedDown: false,
+      undoAvailable: false,
+      redoAvailable: false,
       viewingList: false
     }
   }
+
+  componentWillMount() {
+    localStorage.getItem('memory')&&this.setState({
+      toDoLists: JSON.parse(localStorage.getItem('memory')),
+      viewingList: false,
+      ctrlPressedDown: false,
+      zPressedDown: false,
+      yPressedDown: false,
+      undoAvailable: false,
+      redoAvailable: false,
+      viewingList: false 
+    })
+  }
+
+  componentWillUpdate(nextProps, nextState){
+    localStorage.setItem('memory', JSON.stringify(nextState.toDoLists));
+  }
+
 
   // WILL LOAD THE SELECTED LIST
   loadToDoList = (toDoList) => {
@@ -85,11 +110,25 @@ class App extends Component {
       listItem.contentEditable = false;
     }
 
+    console.log("CURRENT LIST: " + this.state.currentList.id);
+    console.log("LOADING LIST: " + toDoList.id);
+    if(this.state.currentList.id!=toDoList.id){
+      this.tps.clearAllTransactions();
+      this.setState({
+        toDoLists: nextLists,
+        currentList: toDoList,
+        viewingList: true,
+        undoAvailable: false,
+        redoAvailable: false
+      });
+    }
+
     this.setState({
       toDoLists: nextLists,
       currentList: toDoList,
       viewingList: true
     });
+
   }
 
   addNewList = () => {
@@ -152,6 +191,28 @@ class App extends Component {
       itemList.splice(indexOfItem,1);
     }
     this.loadToDoList(this.state.currentList);  //'Refreshes' the list
+    
+    //Checks if a Transaction can be undone/redone
+    if(!this.tps.hasTransactionToUndo()){
+      this.setState({
+        undoAvailable: false
+      });
+    }
+    else{
+      this.setState({
+        undoAvailable: true
+      });
+    }
+    if(!this.tps.hasTransactionToRedo()){
+      this.setState({
+        redoAvailable: false
+      });
+    }
+    else{
+      this.setState({
+        redoAvailable: true
+      });
+    }
   }
 
   //Adds the specific item removed back into the list
@@ -161,15 +222,71 @@ class App extends Component {
       itemList.splice(indexOfItem,0,removedItem);
     }
     this.loadToDoList(this.state.currentList);
+    //Checks if a Transaction can be undone/redone
+    if(!this.tps.hasTransactionToUndo()){
+      this.setState({
+        undoAvailable: false
+      });
+    }
+    else{
+      this.setState({
+        undoAvailable: true
+      });
+    }
+    if(!this.tps.hasTransactionToRedo()){
+      this.setState({
+        redoAvailable: false
+      });
+    }
+    else{
+      this.setState({
+        redoAvailable: true
+      });
+    }
   }
 
-  //Adds a new default item to the current list. Probably best to push
-  addNewListItem = () => {
+  //Creates an addItem Transaction
+  createAddListItemTransaction = () => {
+    let transactionHandler = this.tps;
+    console.log("NEW ITEM ADDED");
+    transactionHandler.addTransaction(new AddNewItem_Transaction(this));
+  }
+
+  //Adds a new default item to the current list. Probably best to push FIX
+  addNewItem = () => {
     console.log("Adding new item");
     let itemList = this.state.currentList.items;
     let newItem = this.makeNewToDoListItem();
-    console.log(newItem);
     itemList.unshift(newItem);
+    this.loadToDoList(this.state.currentList);
+    //Checks if a Transaction can be undone/redone
+    if(!this.tps.hasTransactionToUndo()){
+      this.setState({
+        undoAvailable: false
+      });
+    }
+    else{
+      this.setState({
+        undoAvailable: true
+      });
+    }
+    if(!this.tps.hasTransactionToRedo()){
+      this.setState({
+        redoAvailable: false
+      });
+    }
+    else{
+      this.setState({
+        redoAvailable: true
+      });
+    }
+  }
+
+  //Removes the added item. Logically, this should be the one at the top (pushed)
+  removeLastItem = () => {
+    console.log("REMOVING TOP ITEM");
+    let itemList = this.state.currentList.items;
+    itemList.splice(0,1);
     this.loadToDoList(this.state.currentList);
   }
 
@@ -197,6 +314,28 @@ class App extends Component {
       itemList[indexOfItem-1]=tempItem;
     }
     this.loadToDoList(this.state.currentList);
+    
+    //Checks if a Transaction can be undone/redone
+    if(!this.tps.hasTransactionToUndo()){
+      this.setState({
+        undoAvailable: false
+      });
+    }
+    else{
+      this.setState({
+        undoAvailable: true
+      });
+    }
+    if(!this.tps.hasTransactionToRedo()){
+      this.setState({
+        redoAvailable: false
+      });
+    }
+    else{
+      this.setState({
+        redoAvailable: true
+      });
+    }
   }
 
   //Moves down the item to the current list.
@@ -212,7 +351,6 @@ class App extends Component {
     if(indexOfItem!=-1){
       transactionHandler.addTransaction(new MoveItemDown_Transaction(this, indexOfItem));
     }
-
   }
 
   //Moves item down in the currentlist given its index
@@ -224,6 +362,26 @@ class App extends Component {
       itemList[indexOfItem+1]=tempItem;
     }
     this.loadToDoList(this.state.currentList);
+    if(!this.tps.hasTransactionToUndo()){
+      this.setState({
+        undoAvailable: false
+      });
+    }
+    else{
+      this.setState({
+        undoAvailable: true
+      });
+    }
+    if(!this.tps.hasTransactionToRedo()){
+      this.setState({
+        redoAvailable: false
+      });
+    }
+    else{
+      this.setState({
+        redoAvailable: true
+      });
+    }
   }
   // //Changes the name of the list
   // editListName = () => {
@@ -285,10 +443,28 @@ class App extends Component {
   //Changes the task
   changeStatus = (status, item) => {
     item.status = status;
-    // if(status === "complete")
-    //   item.style.color = "#19c8ff";
-    // else
-    //   item.style.color = "#ffc819";
+    
+    //Checks if a Transaction can be undone/redone
+    if(!this.tps.hasTransactionToUndo()){
+      this.setState({
+        undoAvailable: false
+      });
+    }
+    else{
+      this.setState({
+        undoAvailable: true
+      });
+    }
+    if(!this.tps.hasTransactionToRedo()){
+      this.setState({
+        redoAvailable: false
+      });
+    }
+    else{
+      this.setState({
+        redoAvailable: true
+      });
+    }
   }
 
   //Creates a Transaction for changing the due date
@@ -305,26 +481,164 @@ class App extends Component {
     if(date == "" || date == null)    //If the due date was left blank, placeholder text is set
       item.due_date = "N/A: Assign a Date";
     this.loadToDoList(this.state.currentList);
+
+    //Checks if a Transaction can be undone/redone
+    if(!this.tps.hasTransactionToUndo()){
+      this.setState({
+        undoAvailable: false
+      });
+    }
+    else{
+      this.setState({
+        undoAvailable: true
+      });
+    }
+    if(!this.tps.hasTransactionToRedo()){
+      this.setState({
+        redoAvailable: false
+      });
+    }
+    else{
+      this.setState({
+        redoAvailable: true
+      });
+    }
   }
 
   //Undos the latest Transaction if there is one
   undoTransaction = () => {
+    console.log("Undoing");
     if(this.tps.hasTransactionToUndo()){
         this.tps.undoTransaction();
     }
+        if(!this.tps.hasTransactionToUndo()){
+          this.setState({
+            undoAvailable: false
+          });
+        }
+        else{
+          this.setState({
+            undoAvailable: true
+          });
+
+        }
+        if(this.tps.hasTransactionToRedo()){
+          this.setState({
+            redoAvailable: true
+          });
+        }
+        else{
+          this.setState({
+            redoAvailable: false
+          });
+
+        }
   }
 
   //Redos the latest Transaction if there is one
   redoTransaction = () => {
+    console.log("Redoing");
     if(this.tps.hasTransactionToRedo()){
         this.tps.doTransaction();
     }
+    if(!this.tps.hasTransactionToUndo()){
+      this.setState({
+        undoAvailable: false
+      });
+    }
+    else{
+      this.setState({
+        undoAvailable: true
+      });
+
+    }
+        if(this.tps.hasTransactionToRedo()){
+          this.setState({
+            redoAvailable: true
+          });
+        }
+        else{
+          this.setState({
+            redoAvailable: false
+          });
+
+        }
   }
 
+  //Listens for z or y for undo/redo respectively
+  onKeyPressed = (event) => {
+    console.log("KEY PRESSED");
+    console.log(event.keyCode);
+    if(event.keyCode==17) //ctrl
+    this.setState({
+      ctrlPressedDown: true
+    });
+    else if(event.keyCode==89) //y
+    this.setState({
+      yPressedDown: true
+    });
+    else if(event.keyCode==90) //z
+    this.setState({
+      zPressedDown: true
+    });
+    
+    let ctrlState = this.state.ctrlPressedDown;
+    let yState = this.state.yPressedDown;
+    let zState = this.state.zPressedDown;
+
+    if(ctrlState&&zState){
+      this.undoTransaction();
+      this.setState({
+        zPressedDown: false,
+        ctrlPressedDown: false
+      });
+    }
+    else if(ctrlState&&yState){
+      this.redoTransaction();
+      this.setState({
+        yPressedDown: false,
+        ctrlPressedDown: false
+      });
+    }
+  }
+
+  onKeyReleased = (event) => {
+    if(event.keyCode==17) //ctrl
+    this.setState({
+      ctrlPressedDown: true
+    });
+    else if(event.keyCode==89) //y
+    this.setState({
+      yPressedDown: true
+    });
+    else if(event.keyCode==90) //z
+    this.setState({
+      zPressedDown: true
+    });
+    
+    let ctrlState = this.state.ctrlPressedDown;
+    let yState = this.state.yPressedDown;
+    let zState = this.state.zPressedDown;
+
+    if(ctrlState&&zState){
+      this.undoTransaction();
+      this.setState({
+        zPressedDown: false,
+        ctrlPressedDown: false
+      });
+    }
+    else if(ctrlState&&yState){
+      this.redoTransaction();
+      this.setState({
+        yPressedDown: false,
+        ctrlPressedDown: false
+      });
+    }
+  }
   render() {
     let items = this.state.currentList.items;
     return (
-      <div id="root">
+      <div id="root" onKeyDown={this.onKeyPressed} onKeyUp={this.onKeyReleased} tabIndex={0}>
         <Navbar />
         <LeftSidebar 
           toDoLists={this.state.toDoLists}
@@ -340,7 +654,7 @@ class App extends Component {
           handleSpecificStatusChangeCallback={this.createStatusChangeTransaction}
           handleSpecificDueDateChangeCallback={this.createDueDateChangeTransaction}
           removeListItemCallback={this.createRemoveItemTransaction}
-          addNewListItemCallback={this.addNewListItem}
+          addNewListItemCallback={this.createAddListItemTransaction}
           deleteListItemCallback={this.deleteFirstList}//FIX
           moveListItemUpCallback={this.createMoveItemUpTransaction}
           moveListItemDownCallback={this.createMoveItemDownTransaction}

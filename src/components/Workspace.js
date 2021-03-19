@@ -12,65 +12,67 @@ class Workspace extends Component {
         super(props);
 
         this.state = {
-            undoAvailable: false,
-            redoAvailable: false,
-            viewingList: false
+            undoAvailable: this.props.transactionHandler.hasTransactionToUndo(),
+            redoAvailable: this.props.transactionHandler.hasTransactionToRedo(),
+            viewingList: this.props.appState.state.viewingList
+
         };
     }
     removeSpecificItem = (itemID) => {
         this.props.removeListItemCallback(itemID);
-        let undoAvailable = this.props.transactionHandler.hasTransactionToUndo();
-        let redoAvailable = this.props.transactionHandler.hasTransactionToRedo();
+        let undoAvailableP = this.props.transactionHandler.hasTransactionToUndo();
+        let redoAvailableP = this.props.transactionHandler.hasTransactionToRedo();
         this.setState({
-            undoAvailable: undoAvailable,
-            redoAvailable: redoAvailable
+            undoAvailable: undoAvailableP,
+            redoAvailable: redoAvailableP
         });
     }
     moveSpecificItemUp = (itemID) => {
         this.props.moveListItemUpCallback(itemID);
-        let undoAvailable = this.props.transactionHandler.hasTransactionToUndo();
-        let redoAvailable = this.props.transactionHandler.hasTransactionToRedo();
+        let undoAvailableP = this.props.transactionHandler.hasTransactionToUndo();
+        let redoAvailableP = this.props.transactionHandler.hasTransactionToRedo();
         this.setState({
-            undoAvailable: undoAvailable,
-            redoAvailable: redoAvailable
+            undoAvailable: undoAvailableP,
+            redoAvailable: redoAvailableP
         });
     }
     moveSpecificItemDown = (itemID) => {
         this.props.moveListItemDownCallback(itemID);
-        let undoAvailable = this.props.transactionHandler.hasTransactionToUndo();
-        let redoAvailable = this.props.transactionHandler.hasTransactionToRedo();
-        console.log("UNDO AVAILABLE??? " + undoAvailable);
-        console.log("REDO AVAILABLE??? " + redoAvailable);
+        let undoAvailableP = this.props.transactionHandler.hasTransactionToUndo();
+        let redoAvailableP = this.props.transactionHandler.hasTransactionToRedo();
+        console.log("HELLO");
+        console.log("UNDO AVAILABLE??? " + undoAvailableP);
+        console.log("REDO AVAILABLE??? " + redoAvailableP);
         this.setState({
-            undoAvailable: undoAvailable,
-            redoAvailable: redoAvailable
+            undoAvailable: undoAvailableP,
+            redoAvailable: redoAvailableP
         });
     }
     changeSpecificItemTask = (item, oldTask, newTask) => {
         this.props.handleSpecificTaskChangeCallback(item, oldTask, newTask);
-        let undoAvailable = this.props.transactionHandler.hasTransactionToUndo();
-        let redoAvailable = this.props.transactionHandler.hasTransactionToRedo();
+        let undoAvailableP = this.props.transactionHandler.hasTransactionToUndo();
+        let redoAvailableP = this.props.transactionHandler.hasTransactionToRedo();
         this.setState({
-            undoAvailable: undoAvailable,
-            redoAvailable: redoAvailable
+            undoAvailable: undoAvailableP,
+            redoAvailable: redoAvailableP
         });
     }
     changeSpecificItemStatus = (item, oldStatus, newStatus) => {
         this.props.handleSpecificStatusChangeCallback(item, oldStatus, newStatus);
-        let undoAvailable = this.props.transactionHandler.hasTransactionToUndo();
-        let redoAvailable = this.props.transactionHandler.hasTransactionToRedo();
+        let undoAvailableP = this.props.transactionHandler.hasTransactionToUndo();
+        let redoAvailableP = this.props.transactionHandler.hasTransactionToRedo();
         this.setState({
-            undoAvailable: undoAvailable,
-            redoAvailable: redoAvailable
+            undoAvailable: undoAvailableP,
+            redoAvailable: redoAvailableP
         });
     }
     changeSpecificItemDueDate = (item, oldDate, newDate) => {
         this.props.handleSpecificDueDateChangeCallback(item, oldDate, newDate);
-        let undoAvailable = this.props.transactionHandler.hasTransactionToUndo();
-        let redoAvailable = this.props.transactionHandler.hasTransactionToRedo();
+        let undoAvailableP = this.props.transactionHandler.hasTransactionToUndo();
+        let redoAvailableP = this.props.transactionHandler.hasTransactionToRedo();
         this.setState({
-            undoAvailable: undoAvailable,
-            redoAvailable: redoAvailable
+            undoAvailable: undoAvailableP,
+            redoAvailable: redoAvailableP
         });
     }
     enableUndoButton = () => {
@@ -117,22 +119,33 @@ class Workspace extends Component {
     }
 
     handleUndoFunctionCallback = () => {
+        console.log("CALLING UNDO");
         this.props.undoTransactionCallback();
-        let undoAvailable = this.props.transactionHandler.hasTransactionToUndo();
-        let redoAvailable = this.props.transactionHandler.hasTransactionToRedo();
+        let undoAvailableP = this.props.transactionHandler.hasTransactionToUndo();
+        let redoAvailableP = this.props.transactionHandler.hasTransactionToRedo();
         this.setState({
-            undoAvailable: undoAvailable,
-            redoAvailable: redoAvailable
+            undoAvailable: undoAvailableP,
+            redoAvailable: redoAvailableP
         });
     }
 
     handleRedoFunctionCallback = () => {
         this.props.redoTransactionCallback();
-        let undoAvailable = this.props.transactionHandler.hasTransactionToUndo();
-        let redoAvailable = this.props.transactionHandler.hasTransactionToRedo();
+        let undoAvailableP = this.props.transactionHandler.hasTransactionToUndo();
+        let redoAvailableP = this.props.transactionHandler.hasTransactionToRedo();
         this.setState({
-            undoAvailable: undoAvailable,
-            redoAvailable: redoAvailable
+            undoAvailable: undoAvailableP,
+            redoAvailable: redoAvailableP
+        });
+    }
+
+    handleAddNewItemFunctionCallback = () => {
+        this.props.addNewListItemCallback();
+        let undoAvailableP = this.props.transactionHandler.hasTransactionToUndo();
+        let redoAvailableP = this.props.transactionHandler.hasTransactionToRedo();
+        this.setState({
+            undoAvailable: undoAvailableP,
+            redoAvailable: redoAvailableP
         });
     }
     
@@ -143,11 +156,11 @@ class Workspace extends Component {
     render() {
 
         let redoEnabled = "enabled";
-        if(!this.state.redoAvailable)
+        if(!this.props.transactionHandler.hasTransactionToRedo())
             redoEnabled = "disabled";
 
         let undoEnabled = "enabled";
-        if(!this.state.undoAvailable)
+        if(!this.props.transactionHandler.hasTransactionToUndo())
             undoEnabled = "disabled";
             
         let viewingList = "enabled";
@@ -156,9 +169,15 @@ class Workspace extends Component {
         }
 
         let viewingListON = this.props.appState.state.viewingList;
-        console.log(this.props.appState.state.viewingList);
-        console.log(viewingListON);
         console.log("VIEWING LIST: " + viewingList);
+        console.log(viewingListON);
+
+        console.log("undoEnabled: " + this.props.appState.state.undoAvailable);
+        console.log(this.state.undoAvailable);
+        console.log(undoEnabled);
+        console.log("redoEnabled: " + this.props.appState.state.redoAvailable);
+        console.log(this.state.redoAvailable);
+        console.log(redoEnabled);
         
         return (
             <div id="workspace">
@@ -179,7 +198,7 @@ class Workspace extends Component {
                         }/>
                         <AddBox id="add-item-button" className="list-item-control material-icons todo-button" className={viewingList} 
                         onClick={
-                            (this.state.viewingList ? this.addNewListItemCallback : null)
+                            (this.props.appState.state.viewingList ? this.handleAddNewItemFunctionCallback : null)
                         }/>
                         <Delete id="delete-list-button" className="list-item-control material-icons todo-button" className={viewingList} 
                         onClick={

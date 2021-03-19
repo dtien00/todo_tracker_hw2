@@ -72,7 +72,7 @@ class ToDoItem extends Component {
     handleRemoveItem = () => {
         console.log("Removing Item");
         let listItem = this.props.toDoListItem;
-        // this.props.loadToDoListCallback(this.props.toDoList);
+        
         this.props.removeItemCallback(listItem.id);
         
         
@@ -106,7 +106,6 @@ class ToDoItem extends Component {
     createTaskDiv() {
         let listItem = this.props.toDoListItem;
     }
-        
 
     render() {
         // DISPLAY WHERE WE ARE
@@ -119,7 +118,7 @@ class ToDoItem extends Component {
 
         //Creating our items
         //Task Item (Uneditable Div and Editable input)
-        let taskDiv = <div id={'todo-list-task-' + listItem.id} className='item-col task-col' 
+        let taskDiv = <div id={'todo-list-task-' + listItem.id} className='task-col' 
                         onClick={() => {
                             console.log("TRUE"); 
                             this.setState({
@@ -128,12 +127,10 @@ class ToDoItem extends Component {
                         }}>
                         {listItem.description}
                       </div>;
-        let editableTaskObject = <input type="text" defaultValue={listItem.description} ref={this.taskInput} id={'todo-list-task-input-' + listItem.id} 
-                                        className='item-col task-col' 
+        let editableTaskObject = <input type="text" className='task-col' defaultValue={listItem.description} ref={this.taskInput}
+                                     id={'todo-list-task-input-' + listItem.id} background='#40454e' color='#e9edf0'
+                                      
                         onBlur={() => {
-                            console.log("FALSE");
-                            console.log(this.state.task); 
-                            console.log(this.taskInput.current.value);
                             this.setState({
                                 task: this.taskInput.current.value,
                                 editingTask: false 
@@ -142,7 +139,7 @@ class ToDoItem extends Component {
                                 this.handleTaskChange(this.state.task, this.taskInput.current.value);
                         }}>
                         </input>;
-        let dueDateDiv = <div id={'todo-list-due-date-' + listItem.id} className='item-col due-date-col' 
+        let dueDateDiv = <div id={'todo-list-due-date-' + listItem.id} className={'due-date-col'}
                         onClick={() => {
                             this.setState({
                                 editingDueDate: true
@@ -150,7 +147,7 @@ class ToDoItem extends Component {
                         }}>
                             {listItem.due_date}
                         </div>;
-        let editableDueDateObject = <input type="date" ref={this.dueDateInput} className="item-col due-date-col" background="#353a44" color="#d9d6cc"
+        let editableDueDateObject = <input type="date" ref={this.dueDateInput} className={'due-date-col'} background="#353a44" color="#d9d6cc"
                         onBlur={() => {
                                 console.log("FALSE");
                                 console.log(this.state.dueDate); 
@@ -209,9 +206,9 @@ class ToDoItem extends Component {
                 {this.state.editingDueDate ? editableDueDateObject: dueDateDiv}
                 {this.state.editingStatus ? editableStatusObject : statusDiv}
 
-                <div className='item-col test-4-col'></div>
+                <div className='test-4-col'></div>
 
-                <div className='item-col list-controls-col'>
+                <div className='list-controls-col'>
                     <KeyboardArrowUp id={'move-down-button-'+listItem.id} className='list-item-control todo-button' className={upEnabled} onClick={this.handleMovingUpItem}/>
                     <KeyboardArrowDown id={'move-up-button-'+listItem.id} className='list-item-control todo-button' className={downEnabled} onClick={this.handleMovingDownItem}/>
                     <Close id={'close-button-'+listItem.id} className='list-item-control todo-button' onClick={this.handleRemoveItem}/>
