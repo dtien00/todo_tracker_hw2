@@ -100,18 +100,18 @@ class App extends Component {
     );
     nextLists.unshift(toDoList);
     
-    let listItem = document.getElementById("todo-list-button-"+toDoList.id);
-    listItem.contentEditable = true;
+    // let listItem = document.getElementById("todo-list-button-"+toDoList.id);
+    // listItem.contentEditable = true;
 
-    let toDoItems = document.getElementById("todo-list-items-div");
-    toDoItems.style.visibility = "visible";
+    // let toDoItems = document.getElementById("todo-list-items-div");
+    // toDoItems.style.visibility = "visible";
 
-    listItem.onblur = () => {
-      listItem.contentEditable = false;
-    }
+    // listItem.onblur = () => {
+    //   listItem.contentEditable = false;
+    // }
 
-    console.log("CURRENT LIST: " + this.state.currentList.id);
-    console.log("LOADING LIST: " + toDoList.id);
+    // console.log("CURRENT LIST: " + this.state.currentList.id);
+    // console.log("LOADING LIST: " + toDoList.id);
     if(this.state.currentList.id!=toDoList.id){
       this.tps.clearAllTransactions();
       this.setState({
@@ -124,9 +124,9 @@ class App extends Component {
     }
 
     this.setState({
-      toDoLists: nextLists,
-      currentList: toDoList,
-      viewingList: true
+        toDoLists: nextLists,
+        currentList: toDoList,
+        viewingList: true
     });
 
   }
@@ -213,6 +213,13 @@ class App extends Component {
         redoAvailable: true
       });
     }
+    this.setState({
+      viewingList: true,
+      ctrlPressedDown: false,
+      yPressedDown: false,
+      zPressedDown: false
+    });
+
   }
 
   //Adds the specific item removed back into the list
@@ -243,6 +250,12 @@ class App extends Component {
         redoAvailable: true
       });
     }
+    this.setState({
+      viewingList: true,
+      ctrlPressedDown: false,
+      yPressedDown: false,
+      zPressedDown: false
+    });
   }
 
   //Creates an addItem Transaction
@@ -280,6 +293,12 @@ class App extends Component {
         redoAvailable: true
       });
     }
+    this.setState({
+      viewingList: true,
+      ctrlPressedDown: false,
+      yPressedDown: false,
+      zPressedDown: false
+    });
   }
 
   //Removes the added item. Logically, this should be the one at the top (pushed)
@@ -336,6 +355,12 @@ class App extends Component {
         redoAvailable: true
       });
     }
+    this.setState({
+      viewingList: true,
+      ctrlPressedDown: false,
+      yPressedDown: false,
+      zPressedDown: false
+    });
   }
 
   //Moves down the item to the current list.
@@ -382,6 +407,12 @@ class App extends Component {
         redoAvailable: true
       });
     }
+    this.setState({
+      viewingList: true,
+      ctrlPressedDown: false,
+      yPressedDown: false,
+      zPressedDown: false
+    });
   }
   // //Changes the name of the list
   // editListName = () => {
@@ -425,9 +456,15 @@ class App extends Component {
 
   //Changes the task
   changeTask = (taskChange, item) => {
-    console.log("CURRENT ITEM: \n" + item);
-    console.log("Changing task to: \n" + taskChange);
+    // console.log("CURRENT ITEM: \n" + item);
+    // console.log("Changing task to: \n" + taskChange);
     item.description = taskChange;
+    this.setState({
+      viewingList: true,
+      ctrlPressedDown: false,
+      yPressedDown: false,
+      zPressedDown: false
+    });
     this.loadToDoList(this.state.currentList);
   }
 
@@ -465,6 +502,12 @@ class App extends Component {
         redoAvailable: true
       });
     }
+    this.setState({
+      viewingList: true,
+      ctrlPressedDown: false,
+      yPressedDown: false,
+      zPressedDown: false
+    });
   }
 
   //Creates a Transaction for changing the due date
@@ -503,10 +546,22 @@ class App extends Component {
         redoAvailable: true
       });
     }
+    this.setState({
+      viewingList: true,
+      ctrlPressedDown: false,
+      yPressedDown: false,
+      zPressedDown: false
+    });
   }
 
   //Undos the latest Transaction if there is one
   undoTransaction = () => {
+    this.setState({
+          viewingList: true,
+          ctrlPressedDown: false,
+          yPressedDown: false,
+          zPressedDown: false
+    });
     console.log("Undoing");
     if(this.tps.hasTransactionToUndo()){
         this.tps.undoTransaction();
@@ -537,6 +592,12 @@ class App extends Component {
 
   //Redos the latest Transaction if there is one
   redoTransaction = () => {
+    this.setState({
+          viewingList: true,
+          ctrlPressedDown: false,
+          yPressedDown: false,
+          zPressedDown: false
+    });
     console.log("Redoing");
     if(this.tps.hasTransactionToRedo()){
         this.tps.doTransaction();
@@ -552,17 +613,24 @@ class App extends Component {
       });
 
     }
-        if(this.tps.hasTransactionToRedo()){
+    if(this.tps.hasTransactionToRedo()){
           this.setState({
             redoAvailable: true
           });
-        }
-        else{
+    }
+    else{
           this.setState({
             redoAvailable: false
           });
 
-        }
+    }
+  }
+
+  //Changes the name of the list based on what the use inputted
+  changeListName = (newName, listID) => {
+    // console.log("CHANGINGINGING");
+    this.state.currentList.name = newName;
+    this.setState(this.state);
   }
 
   //Listens for z or y for undo/redo respectively
@@ -586,23 +654,18 @@ class App extends Component {
     let yState = this.state.yPressedDown;
     let zState = this.state.zPressedDown;
 
-    if(ctrlState&&zState){
-      this.undoTransaction();
-      this.setState({
-        zPressedDown: false,
-        ctrlPressedDown: false
-      });
-    }
-    else if(ctrlState&&yState){
-      this.redoTransaction();
-      this.setState({
-        yPressedDown: false,
-        ctrlPressedDown: false
-      });
-    }
+    console.log("DWN STATES (CTRL/Y/Z) : " + ctrlState + " " + yState + " " + zState);
+    // if(ctrlState&&zState){
+    //   this.undoTransaction();
+    // }
+    // else if(ctrlState&&yState){
+    //   this.redoTransaction();
+    // }
   }
 
   onKeyReleased = (event) => {
+    console.log("KEY RELEASED");
+    console.log(event.keyCode);
     if(event.keyCode==17) //ctrl
     this.setState({
       ctrlPressedDown: true
@@ -620,19 +683,12 @@ class App extends Component {
     let yState = this.state.yPressedDown;
     let zState = this.state.zPressedDown;
 
+    console.log("UP STATES (CTRL/Y/Z) : " + ctrlState + " " + yState + " " + zState);
     if(ctrlState&&zState){
       this.undoTransaction();
-      this.setState({
-        zPressedDown: false,
-        ctrlPressedDown: false
-      });
     }
     else if(ctrlState&&yState){
       this.redoTransaction();
-      this.setState({
-        yPressedDown: false,
-        ctrlPressedDown: false
-      });
     }
   }
   render() {
@@ -646,6 +702,7 @@ class App extends Component {
           addNewListCallback={this.addNewList}
           onClick={this.editListName}
           currentList={this.state.currentList}
+          changeListNameCallback={this.changeListName}
         />
         <Workspace toDoListItems={items} 
           transactionHandler={this.tps}

@@ -169,15 +169,15 @@ class Workspace extends Component {
         }
 
         let viewingListON = this.props.appState.state.viewingList;
-        console.log("VIEWING LIST: " + viewingList);
-        console.log(viewingListON);
+        // console.log("VIEWING LIST: " + viewingList);
+        // console.log(viewingListON);
 
-        console.log("undoEnabled: " + this.props.appState.state.undoAvailable);
-        console.log(this.state.undoAvailable);
-        console.log(undoEnabled);
-        console.log("redoEnabled: " + this.props.appState.state.redoAvailable);
-        console.log(this.state.redoAvailable);
-        console.log(redoEnabled);
+        // console.log("undoEnabled: " + this.props.appState.state.undoAvailable);
+        // console.log(this.state.undoAvailable);
+        // console.log(undoEnabled);
+        // console.log("redoEnabled: " + this.props.appState.state.redoAvailable);
+        // console.log(this.state.redoAvailable);
+        // console.log(redoEnabled);
         
         return (
             <div id="workspace">

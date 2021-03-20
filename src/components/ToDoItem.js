@@ -114,7 +114,7 @@ class ToDoItem extends Component {
         let statusType = "status-complete";
         if (listItem.status === "incomplete")
             statusType = "status-incomplete";
-        console.log("Description: " + listItem.description + " Due-Date: " + listItem.due_date + " Status: " + listItem.status);
+        // console.log("Description: " + listItem.description + " Due-Date: " + listItem.due_date + " Status: " + listItem.status);
 
         //Creating our items
         //Task Item (Uneditable Div and Editable input)

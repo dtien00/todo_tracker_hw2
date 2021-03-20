@@ -194,3 +194,14 @@
 .item-col:hover{
     background: var(--swatch-complement);
 }
+
+[id^="todo-list-input-"] {
+    text-align: center;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    border: none;
+    font: var(--font-primary);
+    font-weight: 700;
+    color: var(--swatch-text);
+    background-color: var(--swatch-complement);
+}

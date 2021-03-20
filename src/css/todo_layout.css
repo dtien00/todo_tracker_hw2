@@ -170,3 +170,15 @@
     width:10%;
     padding: 4%;
 } */
+
+
+.listTextInput {
+    width: 1em;
+}
+
+[id^="todo-list-input-"] {
+    padding: 10px 0px;
+    height: auto;
+    margin-right: 50px;
+    width: 80%;
+}

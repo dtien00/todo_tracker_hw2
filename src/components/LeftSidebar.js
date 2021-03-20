@@ -7,7 +7,8 @@ class LeftSidebar extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            viewingList: false
+            viewingList: false,
+            test: true
         }
     }
 
@@ -31,7 +32,7 @@ class LeftSidebar extends Component {
                 {
                     this.props.toDoLists.map((toDoList) => (
                         <ListLink
-                            
+                            changeListName={this.props.changeListNameCallback}
                             key={toDoList.id}
                             currentListID={this.props.currentList.id}
                             toDoLists={this.props.toDoLists}
